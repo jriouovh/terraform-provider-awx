@@ -52,6 +52,12 @@ func resourceInstanceGroup() *schema.Resource {
 				StateFunc:   utils.Normalize,
 				Description: "The pod spec override for the instance group.",
 			},
+			"max_concurrent_jobs": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Default:     0,
+				Description: "The maximum number of jobs to run concurrently on the instance group. Zero means no limit.",
+			},
 			"credential_id": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -78,6 +84,7 @@ func resourceInstanceGroupCreate(ctx context.Context, d *schema.ResourceData, m 
 		"policy_instance_percentage": d.Get("policy_instance_percentage").(int),
 		"pod_spec_override":          d.Get("pod_spec_override").(string),
 		"credential":                 d.Get("credential_id").(string),
+		"max_concurrent_jobs":        d.Get("max_concurrent_jobs").(int),
 	}, map[string]string{})
 	if err != nil {
 		return utils.DiagCreate(diagInstanceGroupTitle, err)
@@ -102,6 +109,7 @@ func resourceInstanceGroupUpdate(ctx context.Context, d *schema.ResourceData, m 
 		"policy_instance_percentage": d.Get("policy_instance_percentage").(int),
 		"pod_spec_override":          d.Get("pod_spec_override").(string),
 		"credential":                 d.Get("credential_id").(string),
+		"max_concurrent_jobs":        d.Get("max_concurrent_jobs").(int),
 	}, nil); err != nil {
 		return utils.DiagUpdate(diagInstanceGroupTitle, id, err)
 	}
@@ -148,6 +156,9 @@ func setInstanceGroupResourceData(d *schema.ResourceData, r *awx.InstanceGroup) 
 	}
 	if err := d.Set("pod_spec_override", utils.Normalize(r.PodSpecOverride)); err != nil {
 		fmt.Println("Error setting pod_spec_override", err)
+	}
+	if err := d.Set("max_concurrent_jobs", r.MaxConcurrentJobs); err != nil {
+		fmt.Println("Error setting max_concurrent_jobs", err)
 	}
 
 	d.SetId(strconv.Itoa(r.ID))

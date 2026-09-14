@@ -329,12 +329,13 @@ type UnifiedJobTemplate struct {
 
 // InstanceGroup represents the awx api instance group.
 type InstanceGroup struct {
-	ID               int    `json:"id"`
-	Capacity         int    `json:"capacity"`
-	CredentialID     int    `json:"credential"` //nolint:golint,stylecheck
-	Name             string `json:"name"`
-	IsContainerGroup bool   `json:"is_container_group"`
-	PodSpecOverride  string `json:"pod_spec_override"`
+	ID                int    `json:"id"`
+	Capacity          int    `json:"capacity"`
+	CredentialID      int    `json:"credential"` //nolint:golint,stylecheck
+	Name              string `json:"name"`
+	IsContainerGroup  bool   `json:"is_container_group"`
+	PodSpecOverride   string `json:"pod_spec_override"`
+	MaxConcurrentJobs int    `json:"max_concurrent_jobs"`
 }
 
 // Result data type.
