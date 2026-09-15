@@ -3,6 +3,7 @@ resource "awx_instance_group" "example" {
   is_container_group         = true
   policy_instance_minimum    = 1
   policy_instance_percentage = 100
+  max_concurrent_jobs        = 12
   pod_spec_override = jsonencode({
     spec = {
       containers = [

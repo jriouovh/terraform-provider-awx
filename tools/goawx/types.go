@@ -284,6 +284,7 @@ type Inventory struct {
 	InventorySourcesWithFailures int         `json:"inventory_sources_with_failures"`
 	InsightsCredential           interface{} `json:"insights_credential"`
 	PendingDeletion              bool        `json:"pending_deletion"`
+	PreventInstanceGroupFallback bool        `json:"prevent_instance_group_fallback"`
 }
 
 // Credential represents the awx api credential.
@@ -329,12 +330,13 @@ type UnifiedJobTemplate struct {
 
 // InstanceGroup represents the awx api instance group.
 type InstanceGroup struct {
-	ID               int    `json:"id"`
-	Capacity         int    `json:"capacity"`
-	CredentialID     int    `json:"credential"` //nolint:golint,stylecheck
-	Name             string `json:"name"`
-	IsContainerGroup bool   `json:"is_container_group"`
-	PodSpecOverride  string `json:"pod_spec_override"`
+	ID                int    `json:"id"`
+	Capacity          int    `json:"capacity"`
+	CredentialID      int    `json:"credential"` //nolint:golint,stylecheck
+	Name              string `json:"name"`
+	IsContainerGroup  bool   `json:"is_container_group"`
+	PodSpecOverride   string `json:"pod_spec_override"`
+	MaxConcurrentJobs int    `json:"max_concurrent_jobs"`
 }
 
 // Result data type.
@@ -415,6 +417,7 @@ type JobTemplate struct {
 	AskJobSliceCountOnLaunch        bool        `json:"ask_job_slice_count_on_launch"`
 	AskTimeoutOnLaunch              bool        `json:"ask_timeout_on_launch"`
 	AskInstanceGroupsOnLaunch       bool        `json:"ask_instance_groups_on_launch"`
+	PreventInstanceGroupFallback    bool        `json:"prevent_instance_group_fallback"`
 	SurveyEnabled                   bool        `json:"survey_enabled"`
 	BecomeEnabled                   bool        `json:"become_enabled"`
 	DiffMode                        bool        `json:"diff_mode"`
@@ -911,6 +914,7 @@ type Schedule struct {
 	Enabled            bool                   `json:"enabled"`
 	UnifiedJobTemplate int                    `json:"unified_job_template"`
 	Inventory          int                    `json:"inventory"`
+	Limit              string                 `json:"limit"`
 	ExtraData          map[string]interface{} `json:"extra_data"`
 }
 

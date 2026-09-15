@@ -192,10 +192,16 @@ func resourceJobTemplate() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
-			"ask_instance_group_on_launch": {
+			"ask_instance_groups_on_launch": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
+			},
+			"prevent_instance_group_fallback": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: "Only run the job on instance groups assigned to this job template, without falling back to the inventory or organization instance groups.",
 			},
 			"survey_enabled": {
 				Type:     schema.TypeBool,
@@ -241,7 +247,7 @@ func resourceJobTemplate() *schema.Resource {
 			"job_slice_count": {
 				Type:     schema.TypeInt,
 				Optional: true,
-				Default:  false,
+				Default:  1,
 			},
 		},
 		Importer: &schema.ResourceImporter{
@@ -286,7 +292,8 @@ func resourceJobTemplateCreate(ctx context.Context, d *schema.ResourceData, m in
 		"ask_forks_on_launch":                 d.Get("ask_forks_on_launch").(bool),
 		"ask_job_slice_count_on_launch":       d.Get("ask_job_slice_count_on_launch").(bool),
 		"ask_timeout_on_launch":               d.Get("ask_timeout_on_launch").(bool),
-		"ask_instance_group_on_launch":        d.Get("ask_instance_group_on_launch").(bool),
+		"ask_instance_groups_on_launch":       d.Get("ask_instance_groups_on_launch").(bool),
+		"prevent_instance_group_fallback":     d.Get("prevent_instance_group_fallback").(bool),
 		"survey_enabled":                      d.Get("survey_enabled").(bool),
 		"become_enabled":                      d.Get("become_enabled").(bool),
 		"diff_mode":                           d.Get("diff_mode").(bool),
@@ -349,7 +356,8 @@ func resourceJobTemplateUpdate(ctx context.Context, d *schema.ResourceData, m in
 		"ask_forks_on_launch":                 d.Get("ask_forks_on_launch").(bool),
 		"ask_job_slice_count_on_launch":       d.Get("ask_job_slice_count_on_launch").(bool),
 		"ask_timeout_on_launch":               d.Get("ask_timeout_on_launch").(bool),
-		"ask_instance_group_on_launch":        d.Get("ask_instance_group_on_launch").(bool),
+		"ask_instance_groups_on_launch":       d.Get("ask_instance_groups_on_launch").(bool),
+		"prevent_instance_group_fallback":     d.Get("prevent_instance_group_fallback").(bool),
 		"survey_enabled":                      d.Get("survey_enabled").(bool),
 		"become_enabled":                      d.Get("become_enabled").(bool),
 		"diff_mode":                           d.Get("diff_mode").(bool),
@@ -453,6 +461,9 @@ func setJobTemplateResourceData(d *schema.ResourceData, r *awx.JobTemplate) *sch
 	if err := d.Set("ask_instance_groups_on_launch", r.AskInstanceGroupsOnLaunch); err != nil {
 		fmt.Println("Error setting ask_instance_groups_on_launch", err)
 	}
+	if err := d.Set("prevent_instance_group_fallback", r.PreventInstanceGroupFallback); err != nil {
+		fmt.Println("Error setting prevent_instance_group_fallback", err)
+	}
 	if err := d.Set("description", r.Description); err != nil {
 		fmt.Println("Error setting description", err)
 	}
@@ -468,7 +479,12 @@ func setJobTemplateResourceData(d *schema.ResourceData, r *awx.JobTemplate) *sch
 	if err := d.Set("host_config_key", r.HostConfigKey); err != nil {
 		fmt.Println("Error setting host_config_key", err)
 	}
-	if err := d.Set("inventory_id", r.Inventory); err != nil {
+	// AWX returns a null inventory for templates that prompt for one on launch
+	inventoryID := ""
+	if r.Inventory != 0 {
+		inventoryID = strconv.Itoa(r.Inventory)
+	}
+	if err := d.Set("inventory_id", inventoryID); err != nil {
 		fmt.Println("Error setting inventory_id", err)
 	}
 	if err := d.Set("job_tags", r.JobTags); err != nil {

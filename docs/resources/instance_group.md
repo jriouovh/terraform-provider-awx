@@ -18,6 +18,7 @@ resource "awx_instance_group" "example" {
   is_container_group         = true
   policy_instance_minimum    = 1
   policy_instance_percentage = 100
+  max_concurrent_jobs        = 12
   pod_spec_override = jsonencode({
     spec = {
       containers = [
@@ -51,6 +52,7 @@ resource "awx_instance_group" "example" {
 
 - `credential_id` (String) ID of the credential of type 'OpenShift or Kubernetes API Bearer Token' to use as remote cluster.
 - `is_container_group` (Boolean) Whether the instance group is a container group.
+- `max_concurrent_jobs` (Number) The maximum number of jobs to run concurrently on the instance group. Zero means no limit.
 - `pod_spec_override` (String) The pod spec override for the instance group.
 - `policy_instance_minimum` (Number) The minimum number of instances to run in the instance group.
 - `policy_instance_percentage` (Number) The percentage of instances to run in the instance group.
